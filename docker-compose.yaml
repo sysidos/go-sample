@@ -1,0 +1,59 @@
+version: "3.7"
+services:
+  postgres:
+    image: 'postgres:11'
+    environment:
+      - POSTGRES_USER=invoice
+      - POSTGRES_PASSWORD=ERvTZSkrJMRFikm77feH
+      - POSTGRES_DB=invoice
+    container_name: 'invoice_postgres'
+    ports:
+      - '5432:5432'
+    volumes:
+      - type: volume
+        source: invoice
+        target: /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  #    networks:
+  #      - invoice
+
+  redis:
+    image: redis
+    container_name: 'invoice_redis'
+    ports:
+      - '6379:6379'
+    volumes:
+      - type: volume
+        source: invoice
+        target: /data
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  #    networks:
+  #      - invoice
+
+  #networks:
+  #  invoice:
+  #    driver: bridge
+
+#  server:
+#    build: .
+#    container_name: 'invoice_server'
+#    restart: on-failure
+#    ports:
+#      - '8080:8080'
+#    depends_on:
+#      - postgres
+#      - redis
+#    volumes:
+#      - ./.env:/app/.env
+
+
+volumes:
+  invoice:
